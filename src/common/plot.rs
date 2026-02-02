@@ -112,6 +112,51 @@ pub fn line_plot(
     Ok(())
 }
 
+/// Creates a 2D line plot with red circle markers at specified highlight points (requires `plotting` feature).
+#[cfg(feature = "plotting")]
+pub fn line_plot_with_markers(
+    path: &str,
+    x_data: &[f64],
+    y_data: &[f64],
+    markers: &[(f64, f64)],
+    config: &PlotConfig,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let root = BitMapBackend::new(path, (config.width, config.height)).into_drawing_area();
+    root.fill(&WHITE)?;
+
+    let x_range = config
+        .x_range
+        .map(|(min, max)| min..max)
+        .unwrap_or_else(|| find_range(x_data, config.margin_fraction));
+    let y_range = config
+        .y_range
+        .map(|(min, max)| min..max)
+        .unwrap_or_else(|| find_range(y_data, config.margin_fraction));
+
+    let mut chart = ChartBuilder::on(&root)
+        .caption(&config.title, ("sans-serif", 30))
+        .margin(10)
+        .x_label_area_size(40)
+        .y_label_area_size(50)
+        .build_cartesian_2d(x_range, y_range)?;
+
+    chart
+        .configure_mesh()
+        .x_desc(&config.x_label)
+        .y_desc(&config.y_label)
+        .draw()?;
+
+    let points: Vec<(f64, f64)> = x_data.iter().zip(y_data.iter()).map(|(&x, &y)| (x, y)).collect();
+    chart.draw_series(LineSeries::new(points, BLUE.stroke_width(config.stroke_width)))?;
+
+    chart.draw_series(
+        markers.iter().map(|&(x, y)| Circle::new((x, y), 8, RED.filled())),
+    )?;
+
+    root.present()?;
+    Ok(())
+}
+
 #[cfg(feature = "plotting")]
 fn find_range(data: &[f64], margin_fraction: f64) -> std::ops::Range<f64> {
     let min = data.iter().cloned().fold(f64::INFINITY, f64::min);
@@ -484,6 +529,18 @@ pub fn line_plot(
     _path: &str,
     _x_data: &[f64],
     _y_data: &[f64],
+    _config: &PlotConfig,
+) -> Result<(), Box<dyn std::error::Error>> {
+    Err("Enable the 'plotting' feature to use this function".into())
+}
+
+/// Stub for when plotting feature is disabled.
+#[cfg(not(feature = "plotting"))]
+pub fn line_plot_with_markers(
+    _path: &str,
+    _x_data: &[f64],
+    _y_data: &[f64],
+    _markers: &[(f64, f64)],
     _config: &PlotConfig,
 ) -> Result<(), Box<dyn std::error::Error>> {
     Err("Enable the 'plotting' feature to use this function".into())

@@ -72,28 +72,23 @@ fn run_week01() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+#[cfg(feature = "plotting")]
 fn run_week02() -> Result<(), Box<dyn std::error::Error>> {
+    let dir = "output/week02";
+    std::fs::create_dir_all(dir)?;
+
     println!("Week 2: Neville's Interpolation");
 
-    // Sample points from y = x^2
-    let points = vec![(-1.0, 1.0), (0.0, 0.0), (1.0, 1.0), (2.0, 4.0)];
-    let test_x = 0.5;
+    println!("  Running problem_neville_plots...");
+    week02_neville::problems::problem_neville_plots(dir)?;
 
-    let result = week02_neville::neville_stock(&points, test_x);
-    println!("  Interpolating y = x² at x = {}", test_x);
-    println!("  Points: {:?}", points);
-    println!("  Neville result: {}", result.value);
-    println!("  Expected:       {}", test_x * test_x);
-    println!("  Error:          {:.2e}", (result.value - test_x * test_x).abs());
+    println!("Week 2 complete. Output in {}/", dir);
+    Ok(())
+}
 
-    // Second example with different target
-    let test_x2 = 1.5;
-    let result2 = week02_neville::neville_stock(&points, test_x2);
-    println!();
-    println!("  Interpolating y = x² at x = {}", test_x2);
-    println!("  Neville result: {}", result2.value);
-    println!("  Expected:       {}", test_x2 * test_x2);
-    println!("  Error:          {:.2e}", (result2.value - test_x2 * test_x2).abs());
-
+#[cfg(not(feature = "plotting"))]
+fn run_week02() -> Result<(), Box<dyn std::error::Error>> {
+    println!("Week 2 requires the 'plotting' feature.");
+    println!("Run with: cargo run --features plotting -- 2");
     Ok(())
 }

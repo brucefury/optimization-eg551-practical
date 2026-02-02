@@ -17,6 +17,7 @@
 
 pub mod types;
 pub mod stock;
+pub mod problems;
 
 // Re-export main types and functions for convenience
 pub use types::NevilleResult;
