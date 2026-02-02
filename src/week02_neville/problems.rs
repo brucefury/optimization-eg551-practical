@@ -8,15 +8,16 @@
 //! x = [0.1, 0.2, 0.3, 0.4, 0.5]
 //! y = [10.00000, 5.00000, 3.33333, 2.50000, 2.00000]
 
-use crate::week02_neville::{neville_stock, NevilleResult};
+use crate::week02_neville::{neville, NevilleResult};
 
 #[cfg(feature = "plotting")]
 use crate::common::plot::{self, PlotConfig};
 
 /// Reusable helper: build points from separate x/y slices, run Neville's, print results.
+#[allow(dead_code)]
 fn interpolate_and_print(x_points: &[f64], y_points: &[f64], x_target: f64) -> NevilleResult {
     let points: Vec<(f64, f64)> = x_points.iter().zip(y_points.iter()).map(|(&x, &y)| (x, y)).collect();
-    let result = neville_stock(&points, x_target);
+    let result = neville(&points, x_target);
 
     println!("  Interpolating at x = {}", x_target);
     println!("  x = {:?}", x_points);

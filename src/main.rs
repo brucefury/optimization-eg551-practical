@@ -1,3 +1,4 @@
+#[allow(unused)]
 use optimization_eg551_practical::*;
 use std::env;
 
