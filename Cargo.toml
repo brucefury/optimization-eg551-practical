@@ -1,0 +1,25 @@
+[package]
+name = "optimization-eg551-practical"
+version = "0.1.0"
+edition = "2021"
+description = "EG551 Practical optimization algorithms"
+
+[dependencies]
+ndarray = "0.15"
+csv = "1.3"
+hashbrown = "0.14"
+
+[dev-dependencies]
+proptest = "1.4"
+approx = "0.5"
+
+[dependencies.plotters]
+version = "0.3"
+optional = true
+
+[features]
+plotting = ["plotters"]
+
+[[bin]]
+name = "eg551"
+path = "src/main.rs"
