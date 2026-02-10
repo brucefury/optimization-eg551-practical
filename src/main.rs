@@ -156,7 +156,8 @@ fn run_week03(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     println!();
 
     let f = |x: f64| x * (x - 1.0);
-    let result = gss(&f, a, b, eps, max_iter, criterion);
+    let timed = common::timing::timed(|| gss(&f, a, b, eps, max_iter, criterion));
+    let result = timed.value;
 
     println!("Golden Section Search Results");
     println!("  Stopping criterion: {criterion_label}");
@@ -172,6 +173,7 @@ fn run_week03(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     );
     println!("  Interval width:     {:.6}", result.interval_width);
     println!("  |f(x1) - f(x2)|:   {:.6}", result.function_value_diff);
+    println!("  Time:               {}", common::timing::format_duration(timed.duration));
 
     Ok(())
 }
