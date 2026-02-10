@@ -22,6 +22,7 @@ pub fn gss(
     max_iter: usize,
     criterion: StoppingCriterion,
 ) -> GssResult {
+    //x1, x2 written in temrs of far end for simplicity
     let mut x1 = b - TAU * (b - a);
     let mut x2 = a + TAU * (b - a);
     let mut fx1 = f(x1);

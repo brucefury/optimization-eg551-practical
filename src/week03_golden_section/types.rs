@@ -12,9 +12,7 @@ pub enum StoppingCriterion {
 /// Result from the Golden Section Search algorithm.
 #[derive(Debug, Clone)]
 pub struct GssResult {
-    /// Left endpoint of the final bracket.
     pub a: f64,
-    /// Right endpoint of the final bracket.
     pub b: f64,
     /// Left interior point.
     pub x1: f64,
