@@ -17,7 +17,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     match week {
         1 => run_week01()?,
         2 => run_week02()?,
-        3 => println!("Week 3: not yet implemented"),
+        3 => run_week03(&args)?,
         4 => println!("Week 4: not yet implemented"),
         5 => println!("Week 5: not yet implemented"),
         6 => println!("Week 6: not yet implemented"),
@@ -91,5 +91,87 @@ fn run_week02() -> Result<(), Box<dyn std::error::Error>> {
 fn run_week02() -> Result<(), Box<dyn std::error::Error>> {
     println!("Week 2 requires the 'plotting' feature.");
     println!("Run with: cargo run --features plotting -- 2");
+    Ok(())
+}
+
+fn run_week03(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
+    use week03_golden_section::{gss, StoppingCriterion};
+
+    let mut a = 0.0_f64;
+    let mut b = 2.0_f64;
+    let mut eps = 0.1_f64;
+    let mut max_iter = 10000_usize;
+    let mut criterion = StoppingCriterion::IntervalWidth;
+
+    // Parse optional arguments after the week number
+    let mut i = 2;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--a" => {
+                i += 1;
+                a = args[i].parse().expect("invalid value for --a");
+            }
+            "--b" => {
+                i += 1;
+                b = args[i].parse().expect("invalid value for --b");
+            }
+            "--eps" => {
+                i += 1;
+                eps = args[i].parse().expect("invalid value for --eps");
+            }
+            "--max-iter" => {
+                i += 1;
+                max_iter = args[i].parse().expect("invalid value for --max-iter");
+            }
+            "--stop" => {
+                i += 1;
+                criterion = match args[i].as_str() {
+                    "interval" => StoppingCriterion::IntervalWidth,
+                    "function" => StoppingCriterion::FunctionValueDiff,
+                    other => {
+                        eprintln!("Unknown stopping criterion: {other}");
+                        eprintln!("Use \"interval\" or \"function\"");
+                        return Ok(());
+                    }
+                };
+            }
+            other => {
+                eprintln!("Unknown option: {other}");
+                eprintln!("Usage: eg551 3 [--a VALUE] [--b VALUE] [--eps VALUE] [--max-iter VALUE] [--stop interval|function]");
+                return Ok(());
+            }
+        }
+        i += 1;
+    }
+
+    let criterion_label = match criterion {
+        StoppingCriterion::IntervalWidth => format!("Interval Width < {eps}"),
+        StoppingCriterion::FunctionValueDiff => format!("|f(x1) - f(x2)| < {eps}"),
+    };
+
+    println!("Week 3: Golden Section Search");
+    println!("  f(x) = x(x - 1) on [{a}, {b}]");
+    println!("  Stopping criterion: {criterion_label}");
+    println!("  Max iterations: {max_iter}");
+    println!();
+
+    let f = |x: f64| x * (x - 1.0);
+    let result = gss(&f, a, b, eps, max_iter, criterion);
+
+    println!("Golden Section Search Results");
+    println!("  Stopping criterion: {criterion_label}");
+    println!("  Iterations:         {}", result.iterations);
+    println!("  Bracket:            [{:.6}, {:.6}]", result.a, result.b);
+    println!(
+        "  x1 = {:.6},  f(x1) = {:.6}",
+        result.x1, result.fx1
+    );
+    println!(
+        "  x2 = {:.6},  f(x2) = {:.6}",
+        result.x2, result.fx2
+    );
+    println!("  Interval width:     {:.6}", result.interval_width);
+    println!("  |f(x1) - f(x2)|:   {:.6}", result.function_value_diff);
+
     Ok(())
 }
